@@ -23,9 +23,13 @@
     "@thi.ng/transducers": "latest",
     "@thi.ng/transducers-binary": "^0.5.4",
     "@thi.ng/transducers-hdom": "latest",
-    "@thi.ng/transducers-stats": "latest"
+    "@thi.ng/transducers-stats": "latest",
+    "three": "^0.114.0"
   },
   "devDependencies": {
+    "@types/node": "^13.9.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "parcel-bundler": "^1.12.4",
     "prettier": "^1.19.1",
     "typescript": "^3.8.3"
