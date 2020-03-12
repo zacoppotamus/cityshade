@@ -12,7 +12,7 @@ let canvas: HTMLCanvasElement;
 let scene: THREE.Scene;
 let camera: THREE.Camera;
 let renderer: THREE.WebGLRenderer;
-let tile: Promise<HTMLImageElement>;
+let tile: ITile;
 // let particlesPos: Float32Array;
 let mapTexture: THREE.DataTexture;
 function init() {
@@ -39,9 +39,11 @@ function init() {
   controls.update();
 
   const offscreenCanvas: ICanvas = new Canvas();
-  tile = new Tile().getTileImg(COORDINATES.NYC);
-  console.time("gen texture");
-  tile.then((tileImg: HTMLImageElement) => {
+  tile = new Tile(COORDINATES.NYC);
+  console.time("gen textures");
+  // make all HTTP requests and generate corresponding textures
+  Promise.all([]).then(([]) => {});
+  tile.streets().then((tileImg: HTMLImageElement) => {
     offscreenCanvas.drawImage(tileImg);
     mapTexture = new THREE.DataTexture(
       offscreenCanvas.generateDataTexture(),
@@ -54,7 +56,7 @@ function init() {
     mapTexture.type = THREE.FloatType;
     mapTexture.needsUpdate = true;
     // console.log(particlesPos);
-    console.timeEnd("gen texture");
+    console.timeEnd("gen textures");
     initMaterials();
     initParticlesGeometry();
     animate();

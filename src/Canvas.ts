@@ -1,5 +1,4 @@
 import { TEXTURE_DIMS } from "./utils/constants";
-import * as THREE from "three";
 
 export default class Canvas implements ICanvas {
   private canvas: OffscreenCanvas;

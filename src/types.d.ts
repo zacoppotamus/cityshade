@@ -16,7 +16,11 @@ interface ICanvas {
 }
 
 interface ITile {
-  getTileImg(coordinates: IPointOfInterest): Promise<HTMLImageElement>;
+  coordinates(coordinates: IPointOfInterest): void;
+  elevation(): Promise<HTMLImageElement>;
+  satellite(): Promise<HTMLImageElement>;
+  streets(): Promise<HTMLImageElement>;
+  getTileImg(url: string, img: HTMLImageElement): Promise<HTMLImageElement>;
 }
 
 interface IPointOfInterest {

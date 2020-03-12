@@ -7,34 +7,59 @@ interface IMapboxURLs {
   streets: string;
 }
 
+interface ILayersImg {
+  elevation: HTMLImageElement;
+  satellite: HTMLImageElement;
+  streets: HTMLImageElement;
+}
+
 export default class Tile implements ITile {
   private img: HTMLImageElement;
-  constructor() {
+  private urls: IMapboxURLs = {} as IMapboxURLs;
+  private layers: ILayersImg = {} as ILayersImg;
+
+  constructor(coordinates: IPointOfInterest) {
     this.img = document.body.appendChild(document.createElement("img"));
     this.img.style.display = "none";
+    this.coordinates(coordinates);
+
+    this.layers = ["elevation", "satellite", "streets"].reduce((acc, val) => {
+      acc[val] = document.body.appendChild(document.createElement("img"));
+      acc[val].style.display = "none";
+      return acc;
+    }, {} as any);
+
+    console.log(this.layers);
     return this;
   }
 
-  async getTileImg(coordinates: IPointOfInterest): Promise<HTMLImageElement> {
-    const { streets: streetURL } = getLayerURLs(coordinates);
+  coordinates(point: IPointOfInterest) {
+    this.urls = getLayerURLs(point);
+  }
+
+  async elevation(): Promise<HTMLImageElement> {
+    return this.getTileImg(this.urls.elevation, this.layers.elevation);
+  }
+
+  async satellite(): Promise<HTMLImageElement> {
+    return this.getTileImg(this.urls.satellite, this.layers.satellite);
+  }
+
+  async streets(): Promise<HTMLImageElement> {
+    return this.getTileImg(this.urls.streets, this.layers.streets);
+  }
+
+  async getTileImg(
+    url: string,
+    img: HTMLImageElement
+  ): Promise<HTMLImageElement> {
+    // const { streets: streetURL } = this.urls;
     return new Promise((resolve, reject) => {
-      this.img.addEventListener("load", () => resolve(this.img));
-      this.img.addEventListener("error", (err: ErrorEvent) => reject(err));
-      this.img.crossOrigin = "";
-      this.img.src = streetURL;
+      img.addEventListener("load", () => resolve(img));
+      img.addEventListener("error", (err: ErrorEvent) => reject(err));
+      img.crossOrigin = "";
+      img.src = url;
     });
-    // await fetch(getTileUrl(coordinates))
-    //   .then(res => res.blob())
-    //   .then(blob => {
-    //     return new Promise((resolve, reject) => {
-    //       this.img.addEventListener("load", () => {
-    //         console.log("resolving");
-    //         resolve(this.img);
-    //       });
-    //       this.img.addEventListener("error", err => reject(err));
-    //       this.img.src = URL.createObjectURL(blob);
-    //     });
-    //   });
   }
 }
 
@@ -47,11 +72,3 @@ function getLayerURLs({ lat, lon, zoom }: IPointOfInterest): IMapboxURLs {
     streets: `https://api.mapbox.com/styles/v1/${mapStyle}/static/${lon},${lat},${zoom}/${TEXTURE_DIMS}x${TEXTURE_DIMS}@2x?attribution=false&logo=false&access_token=${process.env.MAPBOX_ACCESS_TOKEN}`
   };
 }
-
-// function getTileUrl({ lat, lon, zoom }: IPointOfInterest): string {
-//   const dim = TEXTURE_DIMS;
-//   const mapStyle: string = `${process.env.MAPBOX_USER}/ck50z5b163hk61cp6spor8074`;
-//   return `
-//     https://api.mapbox.com/styles/v1/${mapStyle}/static/${lon},${lat},${zoom}/${dim}x${dim}@2x?attribution=false&logo=false&access_token=${process.env.MAPBOX_ACCESS_TOKEN}
-//   `;
-// }
