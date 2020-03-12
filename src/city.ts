@@ -16,10 +16,12 @@ let tile: ITile;
 // let particlesPos: Float32Array;
 let texStreets: THREE.DataTexture;
 let texElevation: THREE.Texture;
+let texSatellite: THREE.Texture;
 
 function init() {
   renderer = new THREE.WebGLRenderer({
-    // depth: true
+    antialias: true,
+    depth: true
   });
   console.log(innerWidth);
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -33,10 +35,10 @@ function init() {
   camera = new THREE.PerspectiveCamera(
     45,
     canvas.width / canvas.height,
-    0.1,
-    1000
+    0.001,
+    1000000
   );
-  camera.position.z = 100;
+  camera.position.z = 500;
   let controls = new OrbitControls(camera, canvas);
   controls.update();
 
@@ -53,6 +55,10 @@ function init() {
       texElevation.format = THREE.RGBAFormat;
       // texElevation.type = THREE.FloatType;
       texElevation.needsUpdate = true;
+
+      texSatellite = new THREE.Texture(satellite);
+      texSatellite.format = THREE.RGBFormat;
+      texSatellite.needsUpdate = true;
 
       offscreenCanvas.drawImage(streets);
       texStreets = new THREE.DataTexture(
@@ -85,8 +91,9 @@ let renderShaderMaterial: THREE.ShaderMaterial;
 function initMaterials() {
   renderShaderMaterial = new THREE.ShaderMaterial({
     uniforms: {
-      positions: { type: "t", value: texStreets },
-      elevation: { type: "t", value: texElevation }
+      tStreetPositions: { type: "t", value: texStreets },
+      elevation: { type: "t", value: texElevation },
+      satellite: { type: "t", value: texSatellite }
     },
     vertexShader: renderVert,
     fragmentShader: renderFrag
@@ -107,7 +114,11 @@ function initParticlesGeometry() {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
   geometry.setAttribute("color", new THREE.BufferAttribute(vertices, 3));
+
   renderMesh = new THREE.Points(geometry, renderShaderMaterial);
+  renderMesh.position.x += -50;
+  renderMesh.position.y += -50;
+  // renderMesh.position.z = -10;
   // renderMesh = new THREE.Points(geometry, new THREE.PointsMaterial({size: 2, vertexColors: true}));
   scene.add(renderMesh);
 }
