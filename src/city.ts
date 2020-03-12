@@ -13,7 +13,7 @@ let scene: THREE.Scene;
 let camera: THREE.Camera;
 let renderer: THREE.WebGLRenderer;
 let tile: Promise<HTMLImageElement>;
-let particlesPos: Float32Array;
+// let particlesPos: Float32Array;
 let mapTexture: THREE.DataTexture;
 function init() {
   renderer = new THREE.WebGLRenderer({
@@ -43,7 +43,6 @@ function init() {
   console.time("gen texture");
   tile.then((tileImg: HTMLImageElement) => {
     offscreenCanvas.drawImage(tileImg);
-    const { data: grayscale } = offscreenCanvas.grayscaleValues();
     mapTexture = new THREE.DataTexture(
       offscreenCanvas.generateDataTexture(),
       TEXTURE_DIMS,
@@ -94,45 +93,4 @@ function initParticlesGeometry() {
   renderMesh = new THREE.Points(geometry, renderShaderMaterial);
   // renderMesh = new THREE.Points(geometry, new THREE.PointsMaterial({size: 2, vertexColors: true}));
   scene.add(renderMesh);
-}
-function initParticlesTexture() {}
-
-function createDoubleFBO(
-  w: number,
-  h: number,
-  filtering: THREE.TextureFilter
-): IDoubleFBO {
-  let rt1 = new THREE.WebGLRenderTarget(w, h, {
-    type: THREE.FloatType,
-    minFilter: filtering || THREE.NearestFilter,
-    magFilter: filtering || THREE.NearestFilter,
-    wrapS: THREE.RepeatWrapping,
-    wrapT: THREE.RepeatWrapping,
-    format: THREE.RGBAFormat,
-    depthBuffer: false,
-    stencilBuffer: false,
-    anisotropy: 1
-  });
-
-  let rt2 = new THREE.WebGLRenderTarget(w, h, {
-    type: THREE.FloatType,
-    minFilter: filtering || THREE.NearestFilter,
-    magFilter: filtering || THREE.NearestFilter,
-    wrapS: THREE.RepeatWrapping,
-    wrapT: THREE.RepeatWrapping,
-    format: THREE.RGBAFormat,
-    depthBuffer: false,
-    stencilBuffer: false,
-    anisotropy: 1
-  });
-
-  return {
-    read: rt1,
-    write: rt2,
-    swap: function() {
-      let temp = this.read;
-      this.read = this.write;
-      this.write = temp;
-    }
-  };
 }
