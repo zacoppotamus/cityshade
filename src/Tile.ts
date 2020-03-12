@@ -63,12 +63,38 @@ export default class Tile implements ITile {
   }
 }
 
+function long2tile(l: number, zoom: number): number {
+  return (((l + 180) / 360) * Math.pow(2, zoom)) | 1;
+}
+
+function lat2tile(l: number, zoom: number): number {
+  return (
+    (((1 -
+      Math.log(
+        Math.tan((l * Math.PI) / 180) + 1 / Math.cos((l * Math.PI) / 180)
+      ) /
+        Math.PI) /
+      2) *
+      Math.pow(2, zoom)) |
+    1
+  );
+}
+
 function getLayerURLs({ lat, lon, zoom }: IPointOfInterest): IMapboxURLs {
+  zoom = zoom | 1;
   const mapStyle: string = `${process.env.MAPBOX_USER}/ck50z5b163hk61cp6spor8074`;
 
   return {
-    satellite: `https://api.mapbox.com/v4/mapbox.satellite/${zoom}/${lon}/${lat}.pngraw?access_token=${process.env.MAPBOX_ACCESS_TOKEN}`,
-    elevation: `https://api.mapbox.com/v4/mapbox.terrain-rgb/${zoom}/${lon}/${lat}.pngraw?access_token=${process.env.MAPBOX_ACCESS_TOKEN}`,
+    satellite: `https://api.mapbox.com/v4/mapbox.satellite/${zoom |
+      1}/${long2tile(lon, zoom)}/${lat2tile(
+      lat,
+      zoom
+    )}@2x.pngraw?access_token=${process.env.MAPBOX_ACCESS_TOKEN}`,
+    elevation: `https://api.mapbox.com/v4/mapbox.terrain-rgb/${zoom |
+      1}/${long2tile(lon, zoom)}/${lat2tile(
+      lat,
+      zoom
+    )}@2x.pngraw?access_token=${process.env.MAPBOX_ACCESS_TOKEN}`,
     streets: `https://api.mapbox.com/styles/v1/${mapStyle}/static/${lon},${lat},${zoom}/${TEXTURE_DIMS}x${TEXTURE_DIMS}@2x?attribution=false&logo=false&access_token=${process.env.MAPBOX_ACCESS_TOKEN}`
   };
 }

@@ -14,7 +14,9 @@ let camera: THREE.Camera;
 let renderer: THREE.WebGLRenderer;
 let tile: ITile;
 // let particlesPos: Float32Array;
-let mapTexture: THREE.DataTexture;
+let texStreets: THREE.DataTexture;
+let texElevation: THREE.Texture;
+
 function init() {
   renderer = new THREE.WebGLRenderer({
     // depth: true
@@ -42,25 +44,35 @@ function init() {
   tile = new Tile(COORDINATES.NYC);
   console.time("gen textures");
   // make all HTTP requests and generate corresponding textures
-  Promise.all([]).then(([]) => {});
-  tile.streets().then((tileImg: HTMLImageElement) => {
-    offscreenCanvas.drawImage(tileImg);
-    mapTexture = new THREE.DataTexture(
-      offscreenCanvas.generateDataTexture(),
-      TEXTURE_DIMS,
-      TEXTURE_DIMS
-    );
-    mapTexture.minFilter = THREE.NearestFilter;
-    mapTexture.magFilter = THREE.NearestFilter;
-    mapTexture.format = THREE.RGBAFormat;
-    mapTexture.type = THREE.FloatType;
-    mapTexture.needsUpdate = true;
-    // console.log(particlesPos);
-    console.timeEnd("gen textures");
-    initMaterials();
-    initParticlesGeometry();
-    animate();
-  });
+  Promise.all([tile.streets(), tile.elevation(), tile.satellite()]).then(
+    ([streets, elevation, satellite]) => {
+      console.log(streets, elevation, satellite);
+      texElevation = new THREE.Texture(elevation);
+      // texElevation.minFilter = THREE.NearestFilter;
+      // texElevation.magFilter = THREE.NearestFilter;
+      texElevation.format = THREE.RGBAFormat;
+      // texElevation.type = THREE.FloatType;
+      texElevation.needsUpdate = true;
+
+      offscreenCanvas.drawImage(streets);
+      texStreets = new THREE.DataTexture(
+        offscreenCanvas.generateDataTexture(),
+        TEXTURE_DIMS,
+        TEXTURE_DIMS
+      );
+      texStreets.minFilter = THREE.NearestFilter;
+      texStreets.magFilter = THREE.NearestFilter;
+      texStreets.format = THREE.RGBAFormat;
+      texStreets.type = THREE.FloatType;
+      texStreets.needsUpdate = true;
+      // console.log(particlesPos);
+      console.timeEnd("gen textures");
+      initMaterials();
+      initParticlesGeometry();
+      animate();
+    }
+  );
+  // tile.streets().then((tileImg: HTMLImageElement) => {});
 }
 
 function animate() {
@@ -72,7 +84,10 @@ let renderMesh;
 let renderShaderMaterial: THREE.ShaderMaterial;
 function initMaterials() {
   renderShaderMaterial = new THREE.ShaderMaterial({
-    uniforms: { positions: { type: "t", value: mapTexture } },
+    uniforms: {
+      positions: { type: "t", value: texStreets },
+      elevation: { type: "t", value: texElevation }
+    },
     vertexShader: renderVert,
     fragmentShader: renderFrag
   });
