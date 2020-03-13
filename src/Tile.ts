@@ -84,6 +84,8 @@ function getLayerURLs({ lat, lon, zoom }: IPointOfInterest): IMapboxURLs {
   const mapStyle: string = `${process.env.MAPBOX_USER}/ck50z5b163hk61cp6spor8074`;
 
   return {
+    // or try the https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/
+    // endpoint if you find corresponding elevation
     satellite: `https://api.mapbox.com/v4/mapbox.satellite/${zoom |
       1}/${long2tile(lon, zoom)}/${lat2tile(
       lat,

@@ -132,6 +132,7 @@ function initParticlesGeometry() {
   renderMesh.position.x += -50;
   renderMesh.position.y += -50;
   renderMesh.position.z = 0;
+  scene.add(new THREE.Points(geometry, renderShaderMaterial));
   // renderMesh = new THREE.Points(geometry, new THREE.PointsMaterial({size: 2, vertexColors: true}));
   scene.add(renderMesh);
 }
