@@ -25,7 +25,9 @@ export const renderVert = `
     vColor = vec4(texture2D(satellite, position.xy));
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
-    gl_PointSize = 1.;
+
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.);
+    gl_PointSize = 1. * (200.0 / -mvPosition.z);
   }
 `;
 
@@ -37,7 +39,9 @@ export const renderFrag = `
 
   varying vec4 vColor;
   void main() {
-    // gl_FragColor = vec4(vColor, 1.);
+    // if (distance(gl_PointCoord, vec2(0.5, .5)) > .5)
+    // discard;
+
     out_FragColor = vColor;
   }
 `;
