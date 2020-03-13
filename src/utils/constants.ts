@@ -11,5 +11,15 @@ export const COORDINATES = {
     lat: 40.7625,
     lon: -73.9083,
     zoom: 10.54
+  },
+  NYC_CLOSER: <IPointOfInterest>{
+    lat: 40.7219,
+    lon: -73.9935,
+    zoom: 13.25
+  },
+  THESSALONIKI: <IPointOfInterest>{
+    lat: 40.6109,
+    lon: 22.962,
+    zoom: 11.5
   }
 };

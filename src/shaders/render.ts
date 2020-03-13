@@ -1,4 +1,5 @@
 export const renderVert = `
+  #version 300 es
   precision highp float;
 
   uniform sampler2D tStreetPositions;
@@ -7,7 +8,6 @@ export const renderVert = `
 
   varying vec4 vColor;
 
-  
   void main() {
     float elevationScale = 0.0005;
     // vec3 pos = 100. * vec3(texture2D(tStreetPositions, position.xy).xyz);
@@ -18,21 +18,26 @@ export const renderVert = `
 
     // Convert the red, green, and blue channels into an elevation.
     float e = -10000.0 + ((rgb.r * 255.0 * 256.0 * 256.0 + rgb.g * 255.0 * 256.0 + rgb.b * 255.0) * 0.1);
-    pos.z = e * .3;
+    pos.z = 100. + e * .3; // allow for maximum zoom without clipping
     
     // vec3 tmp= texture2D(satellite, texture2D(tStreetPositions, position.xy).xy).rgb;
     // vColor = vec4(tmp, 1.);
     vColor = vec4(texture2D(satellite, position.xy));
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
-    gl_PointSize = .1;
+    gl_PointSize = 1.;
   }
 `;
 
 export const renderFrag = `
-varying vec4 vColor;
-void main() {
-  // gl_FragColor = vec4(vColor, 1.);
-  gl_FragColor = vColor;
-}
+  #version 300 es
+  precision highp float;
+  precision highp int;
+  out vec4 out_FragColor;
+
+  varying vec4 vColor;
+  void main() {
+    // gl_FragColor = vec4(vColor, 1.);
+    out_FragColor = vColor;
+  }
 `;

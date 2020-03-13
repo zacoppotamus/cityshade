@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { WEBGL } from "three/examples/jsm/WebGL.js";
+
 import Tile from "./Tile";
 import Canvas from "./Canvas";
 
@@ -9,6 +11,8 @@ import { renderVert, renderFrag } from "./shaders/render";
 window.addEventListener("load", init);
 
 let canvas: HTMLCanvasElement;
+let contextWebGL2: WebGL2RenderingContext | null;
+
 let scene: THREE.Scene;
 let camera: THREE.Camera;
 let renderer: THREE.WebGLRenderer;
@@ -19,7 +23,16 @@ let texElevation: THREE.Texture;
 let texSatellite: THREE.Texture;
 
 function init() {
+  if (WEBGL.isWebGL2Available() === false) {
+    document.body.appendChild(WEBGL.getWebGL2ErrorMessage());
+    return;
+  }
+  canvas = document.createElement("canvas");
+  contextWebGL2 = canvas.getContext("webgl2", { alpha: false });
+  if (!contextWebGL2) return;
   renderer = new THREE.WebGLRenderer({
+    canvas,
+    context: contextWebGL2,
     antialias: true,
     depth: true
   });
@@ -118,7 +131,7 @@ function initParticlesGeometry() {
   renderMesh = new THREE.Points(geometry, renderShaderMaterial);
   renderMesh.position.x += -50;
   renderMesh.position.y += -50;
-  // renderMesh.position.z = -10;
+  renderMesh.position.z = 0;
   // renderMesh = new THREE.Points(geometry, new THREE.PointsMaterial({size: 2, vertexColors: true}));
   scene.add(renderMesh);
 }

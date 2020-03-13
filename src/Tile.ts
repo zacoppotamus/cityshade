@@ -64,19 +64,18 @@ export default class Tile implements ITile {
 }
 
 function long2tile(l: number, zoom: number): number {
-  return (((l + 180) / 360) * Math.pow(2, zoom)) | 1;
+  return Math.floor(((l + 180) / 360) * Math.pow(2, zoom));
 }
 
 function lat2tile(l: number, zoom: number): number {
-  return (
-    (((1 -
+  return Math.floor(
+    ((1 -
       Math.log(
         Math.tan((l * Math.PI) / 180) + 1 / Math.cos((l * Math.PI) / 180)
       ) /
         Math.PI) /
       2) *
-      Math.pow(2, zoom)) |
-    1
+      Math.pow(2, zoom)
   );
 }
 
